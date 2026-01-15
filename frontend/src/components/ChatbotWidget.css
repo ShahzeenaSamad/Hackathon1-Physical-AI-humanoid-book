@@ -270,7 +270,8 @@
   gap: 10px;
 }
 
-.chatbot-input textarea {
+.chatbot-input textarea,
+.chat-input-textarea {
   flex: 1;
   border: 1px solid #e9ecef;
   border-radius: 20px;
@@ -280,6 +281,9 @@
   outline: none;
   max-height: 100px;
   font-family: inherit;
+  min-height: 20px;
+  line-height: 1.4;
+  overflow-y: auto;
 }
 
 .chatbot-input textarea:focus {

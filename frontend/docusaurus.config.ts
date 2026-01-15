@@ -57,7 +57,7 @@ const config: Config = {
 
     // Chatbot configuration
     chatWidget: {
-      backendUrl: 'https://your-huggingface-space.hf.space', // Update this after backend deployment
+      backendUrl: 'https://shahzeenasamad-physical-ai-backend.hf.space', // Updated to actual deployed backend
       position: 'right',
     },
     colorMode: {

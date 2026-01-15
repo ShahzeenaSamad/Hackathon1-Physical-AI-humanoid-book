@@ -1,6 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ChatbotWidget.css';
 
+interface Source {
+  title: string;
+  content: string;
+  relevance_score: number;
+  page_number?: number;
+  chapter?: string;
+}
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -9,19 +17,6 @@ interface Message {
   timestamp: Date;
 }
 
-interface Source {
-  chapter_id: string;
-  title: string;
-  module: string;
-  relevance_score: number;
-}
-
-interface ChatResponse {
-  answer: string;
-  sources: Source[];
-  context_used: boolean;
-  model_used: string;
-}
 
 const ChatbotWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,13 +48,14 @@ const ChatbotWidget: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/chat/query', {
+      const response = await fetch('https://shahzeenasamad-physical-ai-backend.hf.space/api/chat/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           question: userMessage.content,
+          session_id: null,
           top_k: 3
         })
       });
@@ -68,22 +64,29 @@ const ChatbotWidget: React.FC = () => {
         throw new Error('Failed to get response');
       }
 
-      const data: ChatResponse = await response.json();
+      const data = await response.json();
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.answer,
-        sources: data.sources,
+        content: data.answer || data.response || data.message || 'Sorry, I could not process your request.',
+        sources: data.sources?.map((source: any) => ({
+          title: source.title || source.section_title || 'Unknown Source',
+          content: source.content || '',
+          relevance_score: source.score || source.relevance_score || source.similarity_score || 0,
+          chapter: source.chapter_id || source.chapter,
+          page_number: source.page_number
+        })) || [],
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
+      console.error('Chat error:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'I apologize, but I encountered an error while processing your question. Please try again or rephrase your question.',
+        content: 'I apologize, but I encountered an error while processing your question. Please check your connection and try again.',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -92,7 +95,7 @@ const ChatbotWidget: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -188,12 +191,17 @@ const ChatbotWidget: React.FC = () => {
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               placeholder="Ask a question about the textbook..."
               rows={1}
               disabled={isLoading}
+              className="chat-input-textarea"
             />
-            <button onClick={handleSend} disabled={isLoading || !inputValue.trim()}>
+            <button
+              onClick={handleSend}
+              disabled={isLoading || !inputValue.trim()}
+              aria-label="Send message"
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor"/>
               </svg>
