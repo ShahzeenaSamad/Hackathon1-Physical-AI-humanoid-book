@@ -11,7 +11,7 @@ router = APIRouter()
 
 class ChatRequest(BaseModel):
     question: str
-    session_id: str = None
+    session_id: str | None = None
     top_k: int = 3
 
 class ChatResponse(BaseModel):
