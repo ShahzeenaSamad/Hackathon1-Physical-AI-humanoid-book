@@ -16,7 +16,13 @@ app = FastAPI(
 # CORS configuration for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://hackathon1-physical-ai-humanoid-book.vercel.app",
+        "https://*.vercel.app",
+        "*"  # Allow all for maximum compatibility
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,10 +59,10 @@ async def test_rag():
         return {"status": "error", "message": str(e), "trace": traceback.format_exc()}
 
 # Import routers
-from src.api import chat_mock, auth
+from src.api import chat_rag, auth
 
-# Register routers - Using MOCK version for demo
-app.include_router(chat_mock.router, prefix="/api/chat", tags=["chat"])
+# Register routers - Using RAG version for real content search
+app.include_router(chat_rag.router, prefix="/api/chat", tags=["chat"])
 app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
 
 # Other bonus routers placeholders
