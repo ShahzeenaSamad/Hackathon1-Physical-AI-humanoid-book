@@ -77,7 +77,7 @@ const config: Config = {
           label: 'Textbook',
         },
         {
-          href: 'https://github.com/your-username/physical-ai-textbook',
+          href: 'https://github.com/ShahzeenaSamad/Q4-Hackathon1-Physical-AI-humanoid-book',
           label: 'GitHub',
           position: 'right',
         },
@@ -129,7 +129,7 @@ const config: Config = {
             },
             {
               label: 'GitHub Repository',
-              href: 'https://github.com/your-username/physical-ai-textbook',
+              href: 'https://github.com/ShahzeenaSamad/Q4-Hackathon1-Physical-AI-humanoid-book',
             },
           ],
         },
